@@ -1,0 +1,7 @@
+# .gitattributes
+# Map file extensions to git filters
+
+*.php filter=rcs-keywords
+*.xml filter=rcs-keywords
+*.txt filter=rcs-keywords
+*.ini filter=rcs-keywords
