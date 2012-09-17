@@ -150,6 +150,14 @@ class PhpImage
 	 */
 	protected $errors = array();
 
+	private $_rootPath = null;
+
+	private $_cachePath = null;
+
+	private $_cacheSubdirs = null;
+
+	private $_thumbOptions = array();
+
 	/**
 	 * Class constructor
 	 *
@@ -173,7 +181,7 @@ class PhpImage
 		$this->_thumbOptions = $options;
 
 		$this->_cachePath = self::$cachePath ? self::$cachePath : dirname(__FILE__) . '/cache';
-		$this->_cachePath = $this->cleanPath($this->_cachePath);
+		$this->_cachePath = $this->cleanPath($this->_cachePath . '/');
 
 		$this->_cacheSubdirs = is_int(self::$cacheDepth) ? self::$cacheDepth : 2;
 		if ($this->_cacheSubdirs < 1)
@@ -268,7 +276,15 @@ class PhpImage
 		// Output buffer fix (do not add contents of current buffers)
 		// Using @ob_start(); and @ob_end_clean();
 		@ob_start();
-		$factory = PhpThumbFactory::create($src, $options, $srcIsData);
+		try
+		{
+			$factory = PhpThumbFactory::create($src, $options, $srcIsData);
+		}
+		catch (Exception $e)
+		{
+			$this->addError($e->getMessage());
+			$factory = null;
+		}
 		@ob_end_clean();
 
 		return $factory;
@@ -427,8 +443,7 @@ class PhpImage
 			}
 
 			$path = str_replace($this->cleanPath($this->_rootPath . '/'), '', $path);
-			$path = $base . $this->cleanPath($path, '/');
-
+			$path = $base . $this->cleanPath('/' . $path, '/');
 		}
 
 		return $path;
@@ -444,7 +459,7 @@ class PhpImage
 	 */
 	protected function _getImagePath($src='')
 	{
-		$src = $this->cleanPath($src);
+		$src = $this->cleanPath($src, '/');
 
 		if (!$src)
 		{
@@ -455,7 +470,7 @@ class PhpImage
 		{
 			// For internal images use absolute path to prevent http authorisation
 			$base = PhpImageSimpleURI::root(false);
-			$baseRel = PhpImageSimpleURI::root(true) . '/';
+			$baseRel = PhpImageSimpleURI::base(true) . '/';
 
 			// Remove base path
 			$search = array(
