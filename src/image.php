@@ -780,6 +780,11 @@ class PhpImage
 class PhpImageSimpleURI extends PhpImageSimpleObject
 {
 	/**
+	 * @var    string
+	 */
+	protected $uri;
+
+	/**
 	 * @var    string  Protocol
 	 */
 	protected $scheme = null;
@@ -1168,9 +1173,9 @@ class PhpImageSimpleObject
 	 */
 	public function get($key, $def = null)
 	{
-		if (isset($this->$key))
+		if (isset($this->data->$key))
 		{
-			return $this->$key;
+			return $this->data->$key;
 		}
 		return $def;
 	}
@@ -1185,8 +1190,8 @@ class PhpImageSimpleObject
 	 */
 	public function set($key, $val = null)
 	{
-		$prev = isset($this->$key) ? $this->$key : null;
-		$this->$key = $val;
+		$prev = isset($this->data->$key) ? $this->data->$key : null;
+		$this->data->$key = $val;
 		return $prev;
 	}
 
